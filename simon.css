@@ -1,0 +1,50 @@
+.title {
+  text-align: center;
+  color: green;
+  font-size: 45px
+}
+.container {
+    width: 100%;
+    display: flex;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+
+}
+
+.span3 {
+   width: calc( 100% / 4);
+    margin-right: 75px;
+    margin-left: 75px;
+
+
+}
+
+
+.circle {
+  position: relative;
+  border-radius: 50%;
+  width: 100%;
+  height: auto;
+  padding-top: 100%;
+}
+
+#green {
+
+  background-color: #19A54F;
+}
+
+#red {
+
+  background-color: 	#9B1422;
+
+}
+
+#yellow {
+  background-color: 	#CBA528;
+  background-color: 	#f7be02;
+}
+
+#blue {
+  background-color: 	#105299;
+  background-color: 	#298FFB;
+}
