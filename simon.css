@@ -1,7 +1,17 @@
 .title {
   text-align: center;
-  color: green;
-  font-size: 45px
+  color: #19A54F;
+  font-size: 55px
+}
+
+.start {
+
+
+  color: #9B1422;
+  font-size: 65px;
+  margin-top: 20px;
+  text-align: center;
+  vertical-align: middle;
 }
 .container {
     width: 100%;
@@ -15,9 +25,7 @@
    width: calc( 100% / 4);
     margin-right: 75px;
     margin-left: 75px;
-
-
-}
+  }
 
 
 .circle {
@@ -41,10 +49,8 @@
 
 #yellow {
   background-color: 	#CBA528;
-  background-color: 	#f7be02;
 }
 
 #blue {
   background-color: 	#105299;
-  background-color: 	#298FFB;
 }
