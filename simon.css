@@ -1,7 +1,8 @@
 .title {
   text-align: center;
   color: #19A54F;
-  font-size: 55px
+  font-size: 65px;
+  margin-bottom: 50px;
 }
 
 .start {
@@ -9,7 +10,7 @@
 
   color: #9B1422;
   font-size: 65px;
-  margin-top: 20px;
+  margin-top: 50px;
   text-align: center;
   vertical-align: middle;
 }
