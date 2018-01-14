@@ -1,5 +1,5 @@
 // Before first Clean 225 Lines of codes
-var waitYourTurn = true;
+var waitYourTurn = false;
 var simonSaid = [];
 var nextColor = 0;
 var colorLit = false;
@@ -58,39 +58,27 @@ Sound.prototype.stop = function () {
   this.osc.disconnect();
 };
 
-var green = {
-  element: document.getElementById('green'),
-  unlit: '#19A54F',
-  lit: '#02f961',
-  sound: greenSound,
-};
-var red = {
-  element: document.getElementById('red'),
-  unlit: '#9B1422',
-  lit: '#e50b21',
-  sound: redSound,
-};
-var yellow = {
-  element: document.getElementById('yellow'),
-  unlit: '#CBA528',
-  lit: '#f7be02',
-  sound: yellowSound,
-};
-var blue = {
-  element: document.getElementById('blue'),
-  unlit: '#105299',
-  lit: '#298FFB',
-  sound: blueSound,
-};
+function Color(theButton, theUnlit, theLit, theSound) {
+  console.log(this);
+  this.button = document.getElementById(theButton);
+  this.unlit = theUnlit;
+  this.lit = theLit;
+  this.sound = theSound;
+}
+
+var green = new Color('green', '#19A54F', '#02f961', greenSound);
+var red = new Color('red', '#9B1422', '#e50b21', redSound);
+var yellow = new Color('yellow', '#CBA528', '#f7be02', yellowSound);
+var blue = new Color('blue', '#105299', '#298FFB', blueSound);
 
 var colors = [green, red, yellow, blue];
-colorClicked(red);
+colorClicked(green);
 colorClicked(red);
 colorClicked(blue);
 colorClicked(yellow);
 
 function colorClicked(color) {
-  color.element.addEventListener('click', function () {
+  color.button.addEventListener('click', function () {
       if (!waitYourTurn) {
         yourTurn(color);
       }
@@ -99,7 +87,7 @@ function colorClicked(color) {
 
 function light(color, toneLength) {
   this.toneLength = toneLength;
-  color.element.style.backgroundColor = color.lit;
+  color.button.style.backgroundColor = color.lit;
   playSound(color.sound, this.toneLength);
 }
 
@@ -117,7 +105,7 @@ function playSound(colorSound, toneLength, start, isPlaying) {
 }
 
 function unlight(color) {
-  color.element.style.backgroundColor = color.unlit;
+  color.button.style.backgroundColor = color.unlit;
 }
 
 function repeatAfterMe(simonSaid, start) {
@@ -155,7 +143,7 @@ function yourTurn(yourGuess) {
     light(yourGuess, 200);
     nextColor++;
     if (nextColor == 20) {
-      youWin();
+      gameOverVictory(true);
       return;
     }
 
@@ -171,9 +159,9 @@ function yourTurn(yourGuess) {
     }
   } else {
     if (strict) {
-      totalFailure();
+      gameOverVictory(false);
     } else {
-      youFailed();
+      tryAgain();
       setTimeout(function () {
           repeatAfterMe(simonSaid);
         }, 2000);
@@ -182,7 +170,20 @@ function yourTurn(yourGuess) {
   }
 }
 
-function youFailed(start) {
+function gameOverVictory(won, start) {
+  start = start || 0;
+  var result = won ? 'You Win!!!' : 'FAIL!!!';
+  startButton.innerHTML = result;
+  if (start < 1) {
+    setTimeout(function () {
+      gameOverVictory(won, start + 1);
+    }, 3000);
+  } else {
+    restart();
+  }
+}
+
+function tryAgain(start) {
   start = start || 0;
   startButton.innerHTML = 'Wrong!!!';
   if (start < 1) {
@@ -191,29 +192,5 @@ function youFailed(start) {
     }, 2000);
   } else {
     startButton.innerHTML = 'Watch Carefullly...';
-  }
-}
-
-function totalFailure(start) {
-  start = start || 0;
-  startButton.innerHTML = 'FAIL!!!!';
-  if (start < 1) {
-    setTimeout(function () {
-      totalFailure(start + 1);
-    }, 1000);
-  } else {
-    restart();
-  }
-}
-
-function youWin(start) {
-  start = start || 0;
-  startButton.innerHTML = 'You Win!!!!';
-  if (start < 1) {
-    setTimeout(function () {
-      youWin(start + 1);
-    }, 3000);
-  } else {
-    restart();
   }
 }
