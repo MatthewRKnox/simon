@@ -1,3 +1,6 @@
+:focus {outline:0 !important;}
+
+
 .title {
   text-align: center;
   color: #19A54F;
@@ -5,15 +8,48 @@
   margin-bottom: 50px;
 }
 
+#restart {
+    position: fixed;
+    top: 10;
+    left: 10;
+    width: 112px;
+    font-size: 30px;
+    text-align: center;
+    border: 3px solid #73AD21;
+      border-radius: 40px;
+
+}
+
+#strict {
+    color: #19A54F;
+    position: fixed;
+    top: 10;
+    left: 130px;
+    width: 110px;
+    font-size: 30px;
+    text-align: center;
+    border: 3px solid #73AD21;
+    border-radius: 40px;
+}
+
+
+
+
 .start {
-
-
   color: #9B1422;
   font-size: 65px;
   margin-top: 50px;
   text-align: center;
   vertical-align: middle;
 }
+
+#steps {
+  color: #9B1422;
+  font-size: 65px;
+  text-align: center;
+  vertical-align: middle;
+}
+
 .container {
     width: 100%;
     display: flex;
