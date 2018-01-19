@@ -3,30 +3,8 @@ var waitYourTurn = false;
 var simonSaid = [];
 var nextColor = 0;
 var colorLit = false;
-var strict = false;
 
 var title = document.getElementById('title');
-
-var strictButton = document.getElementById('strict');
-strictButton.onclick = function () {
-  if (strict) {
-    strictButton.innerHTML = 'Casual';
-    this.style.color = '#19A54F';
-  } else if (!strict) {
-    strictButton.innerHTML = 'Strict';
-    this.style.color = '#e50b21';
-  }
-
-  strict = !strict;
-};
-
-var startButton = document.getElementById('start');
-startButton.addEventListener('click', function () {
-  if (startButton.innerHTML == 'Start') {
-    startButton.innerHTML = 'Watch Carefullly...';
-    simonsPlan();
-  }
-});
 
 var restartButton = document.getElementById('restart');
 restartButton.addEventListener('click', function () {
@@ -36,6 +14,34 @@ restartButton.addEventListener('click', function () {
 function restart() {
   window.location.href = window.location.href;
 }
+
+let strict = {
+  button: document.getElementById('strict'),
+  casual: () => {
+        strict.button.innerHTML = 'Casual';
+        this.style.color = '#19A54F';
+        strict.isStrict = false;
+      },
+
+  strict: () => {
+        strictButton.innerHTML = 'Strict';
+        this.style.color = '#e50b21';
+        strict.isStrict = true;
+      },
+};
+
+strict.button.onclick = function () {
+  strict.isStrict ? strict.casual : strict.strict;
+};
+
+var startButton = document.getElementById('start');
+
+startButton.addEventListener('click', function () {
+  if (startButton.innerHTML == 'Start') {
+    startButton.innerHTML = 'Watch Carefullly...';
+    simonsPlan();
+  }
+});
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var greenSound = new Sound(440, 'triangle');
@@ -59,7 +65,7 @@ Sound.prototype.stop = function () {
 };
 
 function Color(theButton, theUnlit, theLit, theSound) {
-  console.log(this);
+  console.log('testing' + this);
   this.button = document.getElementById(theButton);
   this.unlit = theUnlit;
   this.lit = theLit;
@@ -158,7 +164,7 @@ function yourTurn(yourGuess) {
       }, 2000);
     }
   } else {
-    if (strict) {
+    if (strict.isStrict) {
       gameOverVictory(false);
     } else {
       tryAgain();
