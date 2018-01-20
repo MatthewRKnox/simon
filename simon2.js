@@ -6,42 +6,53 @@ var colorLit = false;
 
 var title = document.getElementById('title');
 
-var restartButton = document.getElementById('restart');
-restartButton.addEventListener('click', function () {
-  restart();
-});
-
-function restart() {
-  window.location.href = window.location.href;
-}
-
 let strict = {
   button: document.getElementById('strict'),
   casual: () => {
         strict.button.innerHTML = 'Casual';
-        this.style.color = '#19A54F';
+        strict.button.style.color = '#19A54F';
         strict.isStrict = false;
       },
 
-  strict: () => {
-        strictButton.innerHTML = 'Strict';
-        this.style.color = '#e50b21';
+  strict: function () {
+        strict.button.innerHTML = 'Strict';
+        strict.button.style.color = '#e50b21';
         strict.isStrict = true;
       },
 };
 
 strict.button.onclick = function () {
-  strict.isStrict ? strict.casual : strict.strict;
+  strict.isStrict ? strict.casual() : strict.strict();
 };
 
-var startButton = document.getElementById('start');
+let messageBox = {
+  button: document.getElementById('messageBox'),
+};
 
-startButton.addEventListener('click', function () {
-  if (startButton.innerHTML == 'Start') {
-    startButton.innerHTML = 'Watch Carefullly...';
-    simonsPlan();
-  }
-});
+let gameStatus = {
+  button: document.getElementById('start'),
+  toggle: () => {
+    if (gameStatus.gameStarted) {
+      window.location.href = window.location.href;
+      gameStatus.gameStarted = false;
+    } else {
+      gameStatus.simonsTurn();
+      gameStatus.button.innerHTML = 'Restart';
+      gameStatus.gameStarted = true;
+      simonsPlan();
+    }
+  },
+
+  simonsTurn: () => messageBox.button.innerHTML = 'Watch Carefully',
+  playersTurn: () =>messageBox.button.innerHTML = 'Your turn',
+  wrongButton: () => messageBox.button.innerHTML = 'Wrong!!!',
+  playerWon: () => messageBox.button.innerHTML = 'YOU WIN!!!!',
+  playerLost: () =>messageBox.button.innerHTML = 'FAIL!!!',
+};
+
+gameStatus.button.onclick = () => {
+    gameStatus.toggle();
+  };
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var greenSound = new Sound(440, 'triangle');
@@ -65,7 +76,6 @@ Sound.prototype.stop = function () {
 };
 
 function Color(theButton, theUnlit, theLit, theSound) {
-  console.log('testing' + this);
   this.button = document.getElementById(theButton);
   this.unlit = theUnlit;
   this.lit = theLit;
@@ -115,6 +125,7 @@ function unlight(color) {
 }
 
 function repeatAfterMe(simonSaid, start) {
+  gameStatus.simonsTurn();
   waitYourTurn = true;
   var start = start || 0;
   simonColor = start;
@@ -136,7 +147,6 @@ function repeatAfterMe(simonSaid, start) {
 }
 
 function simonsPlan() {
-  startButton.onclick = '';
   var random = Math.floor(Math.random() * 4);
   simonsColor = colors[random];
   simonSaid.push(simonsColor);
@@ -145,10 +155,11 @@ function simonsPlan() {
 }
 
 function yourTurn(yourGuess) {
+  gameStatus.playersTurn();
   if (yourGuess == simonSaid[nextColor]) {
     light(yourGuess, 200);
     nextColor++;
-    if (nextColor == 20) {
+    if (nextColor == 5) {
       gameOverVictory(true);
       return;
     }
@@ -178,25 +189,24 @@ function yourTurn(yourGuess) {
 
 function gameOverVictory(won, start) {
   start = start || 0;
-  var result = won ? 'You Win!!!' : 'FAIL!!!';
-  startButton.innerHTML = result;
+  var result = won ? gameStatus.playerWon() : gameStatus.playerLost();
   if (start < 1) {
     setTimeout(function () {
       gameOverVictory(won, start + 1);
     }, 3000);
   } else {
-    restart();
+    gameStatus.toggle();
   }
 }
 
 function tryAgain(start) {
   start = start || 0;
-  startButton.innerHTML = 'Wrong!!!';
+  gameStatus.wrongButton();
   if (start < 1) {
     setTimeout(function () {
-      youFailed(start + 1);
+      tryAgain(start + 1);
     }, 2000);
   } else {
-    startButton.innerHTML = 'Watch Carefullly...';
+    gameStatus.simonsTurn();
   }
 }
