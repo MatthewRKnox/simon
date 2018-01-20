@@ -3,45 +3,66 @@ var waitYourTurn = false;
 var simonSaid = [];
 var nextColor = 0;
 var colorLit = false;
-var strict = false;
+let simonsAnswer;
 
 var title = document.getElementById('title');
 
-var strictButton = document.getElementById('strict');
-strictButton.onclick = function () {
-  if (strict) {
-    strictButton.innerHTML = 'Casual';
-    this.style.color = '#19A54F';
-  } else if (!strict) {
-    strictButton.innerHTML = 'Strict';
-    this.style.color = '#e50b21';
-  }
+let gameStatus = {
+  button: document.getElementById('start'),
+  startRestart: () => {
+    if (gameStatus.gameStarted) {
+      window.location.href = window.location.href;
+      gameStatus.gameStarted = false;
+    } else {
+      gameStatus.simonsTurn();
+      gameStatus.button.innerHTML = 'Restart';
+      gameStatus.gameStarted = true;
+      simonsPlan();
+    }
+  },
 
-  strict = !strict;
+  simonsFinished: (input) => {
+    if (input == undefined) {
+      return simonsAnswer;
+    }
+
+    simonsAnswer = input;
+    return simonsAnswer;
+  },
+
+  simonsTurn: () => messageBox.button.innerHTML = 'Watch Carefully',
+  playersTurn: () =>messageBox.button.innerHTML = 'Your turn',
+  wrongButton: () => messageBox.button.innerHTML = 'Wrong!!!',
+  playerWon: () => messageBox.button.innerHTML = 'YOU WIN!!!!',
+  playerLost: () =>messageBox.button.innerHTML = 'FAIL!!!',
 };
 
-var startButton = document.getElementById('start');
-startButton.addEventListener('click', function () {
-  if (startButton.innerHTML == 'Start') {
-    startButton.innerHTML = 'Watch Carefullly...';
-    simonsPlan();
-  }
-});
+gameStatus.button.onclick = () => {
+    gameStatus.startRestart();
+  };
 
-var restartButton = document.getElementById('restart');
-restartButton.addEventListener('click', function () {
-  restart();
-});
+let difficulty = {
+  button: document.getElementById('strict'),
+  casual: () => {
+        difficulty.button.innerHTML = 'Casual';
+        difficulty.button.style.color = '#19A54F';
+        difficulty.isStrict = false;
+      },
 
-function restart() {
-  window.location.href = window.location.href;
-}
+  strict: function () {
+        difficulty.button.innerHTML = 'Strict';
+        difficulty.button.style.color = '#e50b21';
+        difficulty.isStrict = true;
+      },
+};
 
-var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-var greenSound = new Sound(440, 'triangle');
-var redSound = new Sound(523.3, 'triangle');
-var blueSound = new Sound(587.3, 'triangle');
-var yellowSound = new Sound(659.3, 'triangle');
+difficulty.button.onclick = function () {
+  difficulty.isStrict ? difficulty.casual() : difficulty.strict();
+};
+
+let messageBox = {
+  button: document.getElementById('messageBox'),
+};
 
 function Sound(frequency) {
   this.osc = audioCtx.createOscillator();
@@ -58,8 +79,13 @@ Sound.prototype.stop = function () {
   this.osc.disconnect();
 };
 
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+var greenSound = new Sound(440, 'triangle');
+var redSound = new Sound(523.3, 'triangle');
+var blueSound = new Sound(587.3, 'triangle');
+var yellowSound = new Sound(659.3, 'triangle');
+
 function Color(theButton, theUnlit, theLit, theSound) {
-  console.log(this);
   this.button = document.getElementById(theButton);
   this.unlit = theUnlit;
   this.lit = theLit;
@@ -79,7 +105,7 @@ colorClicked(yellow);
 
 function colorClicked(color) {
   color.button.addEventListener('click', function () {
-      if (!waitYourTurn) {
+      if (gameStatus.simonsFinished()) {
         yourTurn(color);
       }
     });
@@ -91,7 +117,12 @@ function light(color, toneLength) {
   playSound(color.sound, this.toneLength);
 }
 
+function unlight(color) {
+  color.button.style.backgroundColor = color.unlit;
+}
+
 function playSound(colorSound, toneLength, start, isPlaying) {
+
   var isPlaying = isPlaying || false;
   var start = start || 0;
   this.colorSound = colorSound;
@@ -104,16 +135,13 @@ function playSound(colorSound, toneLength, start, isPlaying) {
   }
 }
 
-function unlight(color) {
-  color.button.style.backgroundColor = color.unlit;
-}
-
 function repeatAfterMe(simonSaid, start) {
-  waitYourTurn = true;
+  gameStatus.simonsFinished(false);
+  gameStatus.simonsTurn();
   var start = start || 0;
   simonColor = start;
   if (!colorLit) {
-    light(simonSaid[simonColor], 800);
+    light(simonSaid[simonColor], 700);
   } else {
     unlight(simonSaid[simonColor]);
   }
@@ -123,14 +151,14 @@ function repeatAfterMe(simonSaid, start) {
   if (start < simonSaid.length) {
     setTimeout(function () {
         repeatAfterMe(simonSaid, start);
-      }, 1000);
+      }, 700);
   } else {
-    waitYourTurn = false;
+    gameStatus.playersTurn();
+    gameStatus.simonsFinished(true);
   }
 }
 
 function simonsPlan() {
-  startButton.onclick = '';
   var random = Math.floor(Math.random() * 4);
   simonsColor = colors[random];
   simonSaid.push(simonsColor);
@@ -142,7 +170,7 @@ function yourTurn(yourGuess) {
   if (yourGuess == simonSaid[nextColor]) {
     light(yourGuess, 200);
     nextColor++;
-    if (nextColor == 20) {
+    if (nextColor == 5) {
       gameOverVictory(true);
       return;
     }
@@ -158,9 +186,10 @@ function yourTurn(yourGuess) {
       }, 2000);
     }
   } else {
-    if (strict) {
+    if (difficulty.isStrict) {
       gameOverVictory(false);
     } else {
+      nextColor = 0;
       tryAgain();
       setTimeout(function () {
           repeatAfterMe(simonSaid);
@@ -172,25 +201,24 @@ function yourTurn(yourGuess) {
 
 function gameOverVictory(won, start) {
   start = start || 0;
-  var result = won ? 'You Win!!!' : 'FAIL!!!';
-  startButton.innerHTML = result;
+  var result = won ? gameStatus.playerWon() : gameStatus.playerLost();
   if (start < 1) {
     setTimeout(function () {
       gameOverVictory(won, start + 1);
     }, 3000);
   } else {
-    restart();
+    gameStatus.startRestart();
   }
 }
 
 function tryAgain(start) {
   start = start || 0;
-  startButton.innerHTML = 'Wrong!!!';
+  gameStatus.wrongButton();
   if (start < 1) {
     setTimeout(function () {
-      youFailed(start + 1);
+      tryAgain(start + 1);
     }, 2000);
   } else {
-    startButton.innerHTML = 'Watch Carefullly...';
+    gameStatus.simonsTurn();
   }
 }
